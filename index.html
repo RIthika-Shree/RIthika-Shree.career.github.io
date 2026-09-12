@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Career & Skill Gap Analyzer</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        /* NAVBAR */
+        nav {
+            height: 70px;
+            background: #111827;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 14px;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #111827, #1e40af);
+            color: white;
+            padding: 70px 7% 90px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 46px;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 span {
+            color: #60a5fa;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin: auto;
+            color: #dbeafe;
+            line-height: 1.7;
+            font-size: 17px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            padding: 8px 18px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* MAIN */
+        .container {
+            width: 86%;
+            max-width: 1100px;
+            margin: -45px auto 60px;
+            position: relative;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        /* FORM */
+        label {
+            display: block;
+            margin: 20px 0 8px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: #2563eb;
+        }
+
+        .skills-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .skill-option {
+            padding: 9px 14px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        .skill-option:hover {
+            background: #dbeafe;
+        }
+
+        .skill-option.selected {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .selected-skills {
+            margin-top: 15px;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            margin-top: 30px;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .analyze-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        /* RESULTS */
+        #results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: conic-gradient(#2563eb 0deg, #2563eb 0deg, #e5e7eb 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: "";
+            width: 118px;
+            height: 118px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score-number {
+            position: relative;
+            z-index: 2;
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e40af;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .result-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .result-box h3 {
+            margin-bottom: 15px;
+        }
+
+        .result-box ul {
+            list-style: none;
+        }
+
+        .result-box li {
+            padding: 9px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .result-box li:last-child {
+            border-bottom: none;
+        }
+
+        .matched h3 {
+            color: #16a34a;
+        }
+
+        .missing h3 {
+            color: #dc2626;
+        }
+
+        .roadmap {
+            margin-top: 25px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            gap: 18px;
+            padding: 17px;
+            margin: 10px 0;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .step {
+            width: 35px;
+            height: 35px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .project-list {
+            margin-top: 20px;
+        }
+
+        .project-card {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 17px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .project-card strong {
+            color: #1d4ed8;
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        /* ABOUT */
+        .about {
+            padding: 60px 7%;
+            background: white;
+        }
+
+        .about h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .about > p {
+            text-align: center;
+            max-width: 700px;
+            margin: auto;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .about-grid {
+            max-width: 1000px;
+            margin: 35px auto 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .about-card {
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .about-card .icon {
+            font-size: 35px;
+            margin-bottom: 12px;
+        }
+
+        .about-card p {
+            color: #64748b;
+            margin-top: 8px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #111827;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 25px;
+            font-size: 14px;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .result-grid,
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            nav {
+                padding: 0 4%;
+            }
+
+            nav a {
+                display: none;
+            }
+
+            .card {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+    <div class="logo">Career<span>AI</span></div>
+
+    <div>
+        <a href="#analyzer">Analyzer</a>
+        <a href="#about">How It Works</a>
+    </div>
+</nav>
+
+
+<!-- HERO -->
+<section class="hero">
+
+    <div class="badge">🤖 AI-Powered Career Guidance</div>
+
+    <h1>Find Your <span>Career Skill Gap</span></h1>
+
+    <p>
+        Discover how prepared you are for your dream engineering career.
+        Select your target role, choose your current skills and receive
+        an AI-generated skill gap analysis and learning roadmap.
+    </p>
+
+</section>
+
+
+<!-- ANALYZER -->
+<main class="container" id="analyzer">
+
+    <div class="card">
+
+        <h2>🎯 Career Skill Analyzer</h2>
+
+        <p class="subtitle">
+            Tell us about your current skills and your desired career.
+        </p>
+
+
+        <!-- CAREER -->
+        <label for="career">Select Your Target Career</label>
+
+        <select id="career" onchange="updateSkills()">
+
+            <option value="ai">AI / Machine Learning Engineer</option>
+
+            <option value="web">
+                Full Stack Web Developer
+            </option>
+
+            <option value="data">
+                Data Scientist
+            </option>
+
+            <option value="cyber">
+                Cybersecurity Engineer
+            </option>
+
+            <option value="cloud">
+                Cloud Engineer
+            </option>
+
+            <option value="embedded">
+                Embedded Systems Engineer
+            </option>
+
+        </select>
+
+
+        <!-- SKILLS -->
+        <label>Select Your Current Skills</label>
+
+        <div class="skills-box" id="skillsBox"></div>
+
+        <div class="selected-skills" id="selectedSkills">
+            No skills selected yet.
+        </div>
+
+
+        <!-- ANALYZE -->
+        <button class="analyze-btn" onclick="analyzeCareer()">
+            ✨ Analyze My Career
+        </button>
+
+
+        <!-- RESULTS -->
+        <div id="results">
+
+            <hr style="margin: 35px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+            <div class="result-header">
+
+                <h2>Your Career Readiness</h2>
+
+                <div class="score-circle" id="scoreCircle">
+
+                    <div class="score-number" id="score">
+                        0%
+                    </div>
+
+                </div>
+
+                <p id="scoreMessage"></p>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <!-- MATCHED -->
+                <div class="result-box matched">
+
+                    <h3>✅ Your Strong Skills</h3>
+
+                    <ul id="matchedList"></ul>
+
+                </div>
+
+
+                <!-- MISSING -->
+                <div class="result-box missing">
+
+                    <h3>⚠️ Skills You Need</h3>
+
+                    <ul id="missingList"></ul>
+
+                </div>
+
+            </div>
+
+
+            <!-- ROADMAP -->
+            <div class="result-box roadmap">
+
+                <h3>🗺️ Personalized Learning Roadmap</h3>
+
+                <div id="roadmapList"></div>
+
+            </div>
+
+
+            <!-- PROJECTS -->
+            <div class="result-box project-list">
+
+                <h3>💡 Recommended Projects</h3>
+
+                <div id="projectList"></div>
+
+            </div>
+
+
+            <div class="message">
+                💡 Tip: Build projects using your missing skills.
+                Practical experience can make your portfolio stronger.
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- ABOUT -->
+<section class="about" id="about">
+
+    <h2>How CareerAI Works</h2>
+
+    <p>
+        Our system uses a simple AI-inspired skill matching approach
+        to compare your current skills with the skills commonly needed
+        for your selected career.
+    </p>
+
+
+    <div class="about-grid">
+
+        <div class="about-card">
+
+            <div class="icon">🎯</div>
+
+            <h3>Choose Career</h3>
+
+            <p>
+                Select the engineering role you want to pursue.
+            </p>
+
+        </div>
+
+
+        <div class="about-card">
+
+            <div class="icon">🧠</div>
+
+            <h3>Analyze Skills</h3>
+
+            <p>
+                Your skills are compared with the target career requirements.
+            </p>
+
+        </div>
+
+
+        <div class="about-card">
+
+            <div class="icon">🚀</div>
+
+            <h3>Get Roadmap</h3>
+
+            <p>
+                Receive a personalized roadmap and project suggestions.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+
+    © 2026 CareerAI | AI Career & Skill Gap Analyzer
+
+</footer>
+
+
+<script>
+
+    /*
+        CAREER DATABASE
+
+        Each career contains:
+        - required skills
+        - learning roadmap
+        - project recommendations
+    */
+
+    const careerData = {
+
+        ai: {
+
+            skills: [
+                "Python",
+                "Machine Learning",
+                "Deep Learning",
+                "SQL",
+                "Statistics",
+                "TensorFlow",
+                "Data Visualization",
+                "Git"
+            ],
+
+            roadmap: [
+                "Master Python programming",
+                "Learn statistics and data analysis",
+                "Study Machine Learning algorithms",
+                "Learn Deep Learning and neural networks",
+                "Build AI/ML projects",
+                "Learn Git and deploy your project"
+            ],
+
+            projects: [
+                "AI Resume Screening System",
+                "House Price Prediction",
+                "Student Performance Predictor"
+            ]
+
+        },
+
+
+        web: {
+
+            skills: [
+                "HTML",
+                "CSS",
+                "JavaScript",
+                "React",
+                "Node.js",
+                "SQL",
+                "Git",
+                "REST API"
+            ],
+
+            roadmap: [
+                "Learn HTML and semantic web structure",
+                "Master CSS and responsive design",
+                "Learn JavaScript",
+                "Learn React",
+                "Learn Node.js and backend development",
+                "Build and deploy full-stack applications"
+            ],
+
+            projects: [
+                "AI Portfolio Website",
+                "College Management System",
+                "Online Learning Platform"
+            ]
+
+        },
+
+
+        data: {
+
+            skills: [
+                "Python",
+                "SQL",
+                "Statistics",
+                "Pandas",
+                "NumPy",
+                "Data Visualization",
+                "Machine Learning",
+                "Excel"
+            ],
+
+            roadmap: [
+                "Learn Python for data analysis",
+                "Master NumPy and Pandas",
+                "Learn SQL",
+                "Study statistics",
+                "Learn data visualization",
+                "Apply Machine Learning to datasets"
+            ],
+
+            projects: [
+                "Student Data Analytics Dashboard",
+                "Sales Prediction System",
+                "COVID Data Visualization"
+            ]
+
+        },
+
+
+        cyber: {
+
+            skills: [
+                "Networking",
+                "Linux",
+                "Python",
+                "Cybersecurity",
+                "Ethical Hacking",
+                "Cryptography",
+                "Wireshark",
+                "Git"
+            ],
+
+            roadmap: [
+                "Learn computer networking",
+                "Master Linux fundamentals",
+                "Learn Python scripting",
+                "Study cybersecurity concepts",
+                "Learn ethical security testing in authorized environments",
+                "Build a security monitoring project"
+            ],
+
+            projects: [
+                "Network Monitoring Dashboard",
+                "Password Strength Analyzer",
+                "Phishing Awareness Simulator"
+            ]
+
+        },
+
+
+        cloud: {
+
+            skills: [
+                "Linux",
+                "Networking",
+                "Python",
+                "AWS",
+                "Docker",
+                "Git",
+                "Kubernetes",
+                "SQL"
+            ],
+
+            roadmap: [
+                "Learn Linux fundamentals",
+                "Understand networking",
+                "Learn cloud computing concepts",
+                "Learn AWS fundamentals",
+                "Learn Docker",
+                "Study container orchestration and deployment"
+            ],
+
+            projects: [
+                "Cloud File Storage System",
+                "Dockerized Web Application",
+                "Cloud Monitoring Dashboard"
+            ]
+
+        },
+
+
+        embedded: {
+
+            skills: [
+                "C",
+                "C++",
+                "Arduino",
+                "Microcontrollers",
+                "Electronics",
+                "IoT",
+                "Python",
+                "Embedded Systems"
+            ],
+
+            roadmap: [
+                "Learn C programming",
+                "Understand electronics fundamentals",
+                "Learn microcontrollers",
+                "Build Arduino projects",
+                "Learn IoT communication",
+                "Build an embedded system prototype"
+            ],
+
+            projects: [
+                "Smart Home Automation",
+                "IoT Energy Monitor",
+                "Smart Agriculture System"
+            ]
+
+        }
+
+    };
+
+
+    /*
+        DISPLAY SKILLS
+    */
+
+    function updateSkills() {
+
+        const career =
+            document.getElementById("career").value;
+
+        const skillsBox =
+            document.getElementById("skillsBox");
+
+        skillsBox.innerHTML = "";
+
+        careerData[career].skills.forEach(skill => {
+
+            const button =
+                document.createElement("div");
+
+            button.className = "skill-option";
+
+            button.textContent = skill;
+
+            button.onclick = function () {
+
+                button.classList.toggle("selected");
+
+                updateSelectedSkills();
+
+            };
+
+            skillsBox.appendChild(button);
+
+        });
+
+        document.getElementById("results").style.display = "none";
+
+        updateSelectedSkills();
+    }
+
+
+    /*
+        SHOW SELECTED SKILLS
+    */
+
+    function updateSelectedSkills() {
+
+        const selected =
+            document.querySelectorAll(".skill-option.selected");
+
+        const display =
+            document.getElementById("selectedSkills");
+
+        if (selected.length === 0) {
+
+            display.textContent =
+                "No skills selected yet.";
+
+            return;
+        }
+
+        const names =
+            Array.from(selected)
+            .map(item => item.textContent);
+
+        display.textContent =
+            "Selected: " + names.join(", ");
+
+    }
+
+
+    /*
+        MAIN ANALYSIS
+    */
+
+    function analyzeCareer() {
+
+        const career =
+            document.getElementById("career").value;
+
+        const selectedElements =
+            document.querySelectorAll(".skill-option.selected");
+
+        const currentSkills =
+            Array.from(selectedElements)
+            .map(item => item.textContent);
+
+
+        const requiredSkills =
+            careerData[career].skills;
+
+
+        if (currentSkills.length === 0) {
+
+            alert(
+                "Please select at least one skill before analyzing."
+            );
+
+            return;
+        }
+
+
+        /*
+            FIND MATCHED AND MISSING SKILLS
+        */
+
+        const matched =
+            requiredSkills.filter(skill =>
+                currentSkills.includes(skill)
+            );
+
+
+        const missing =
+            requiredSkills.filter(skill =>
+                !currentSkills.includes(skill)
+            );
+
+
+        /*
+            CALCULATE SCORE
+        */
+
+        const score =
+            Math.round(
+                (matched.length / requiredSkills.length) * 100
+            );
+
+
+        /*
+            DISPLAY SCORE
+        */
+
+        document.getElementById("score").textContent =
+            score + "%";
+
+
+        const circle =
+            document.getElementById("scoreCircle");
+
+
+        circle.style.background =
+            `conic-gradient(
+                #2563eb ${score * 3.6}deg,
+                #e5e7eb ${score * 3.6}deg
+            )`;
+
+
+        /*
+            SCORE MESSAGE
+        */
+
+        let message = "";
+
+        if (score >= 80) {
+
+            message =
+                "🚀 Excellent! You are highly prepared for this career.";
+
+        } else if (score >= 60) {
+
+            message =
+                "👍 Good progress! A few important skills are still missing.";
+
+        } else if (score >= 40) {
+
+            message =
+                "📚 You have a foundation, but you need to develop more skills.";
+
+        } else {
+
+            message =
+                "🌱 You are at the beginning of your journey. Start with the roadmap below.";
+
+        }
+
+
+        document.getElementById("scoreMessage").textContent =
+            message;
+
+
+        /*
+            MATCHED SKILLS
+        */
+
+        const matchedList =
+            document.getElementById("matchedList");
+
+        matchedList.innerHTML = "";
+
+
+        if (matched.length === 0) {
+
+            matchedList.innerHTML =
+                "<li>No matching skills yet.</li>";
+
+        } else {
+
+            matched.forEach(skill => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent =
+                    "✓ " + skill;
+
+                matchedList.appendChild(li);
+
+            });
+
+        }
+
+
+        /*
+            MISSING SKILLS
+        */
+
+        const missingList =
+            document.getElementById("missingList");
+
+        missingList.innerHTML = "";
+
+
+        if (missing.length === 0) {
+
+            missingList.innerHTML =
+                "<li>🎉 No major skill gaps detected!</li>";
+
+        } else {
+
+            missing.forEach(skill => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent =
+                    "→ " + skill;
+
+                missingList.appendChild(li);
+
+            });
+
+        }
+
+
+        /*
+            LEARNING ROADMAP
+        */
+
+        const roadmapList =
+            document.getElementById("roadmapList");
+
+        roadmapList.innerHTML = "";
+
+
+        careerData[career].roadmap.forEach(
+            (item, index) => {
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    "roadmap-item";
+
+                div.innerHTML = `
+
+                    <div class="step">
+                        ${index + 1}
+                    </div>
+
+                    <div>
+                        <strong>Step ${index + 1}</strong>
+
+                        <p style="margin-top:5px;color:#64748b;">
+                            ${item}
+                        </p>
+                    </div>
+
+                `;
+
+                roadmapList.appendChild(div);
+
+            }
+        );
+
+
+        /*
+            PROJECT RECOMMENDATIONS
+        */
+
+        const projectList =
+            document.getElementById("projectList");
+
+        projectList.innerHTML = "";
+
+
+        careerData[career].projects.forEach(
+            project => {
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    "project-card";
+
+                div.innerHTML = `
+                    💡 <strong>${project}</strong>
+                    <p style="margin-top:5px;color:#475569;">
+                        Build this project to gain practical experience.
+                    </p>
+                `;
+
+                projectList.appendChild(div);
+
+            }
+        );
+
+
+        /*
+            SHOW RESULTS
+        */
+
+        document.getElementById("results").style.display =
+            "block";
+
+
+        /*
+            SCROLL TO RESULTS
+        */
+
+        document.getElementById("results")
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+    }
+
+
+    /*
+        LOAD DEFAULT CAREER
+    */
+
+    updateSkills();
+
+</script>
+
+</body>
+</html>
